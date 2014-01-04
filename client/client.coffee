@@ -32,4 +32,4 @@ require 'Canvas', (canvasLib) ->
 		Meteor.setInterval(updateCanvasFn, 5000)
 
 	Template.canvas.events
-		'mousemove': (event) -> updatePointFn(event)
+		mousemove: (event) -> updatePointFn(event)
