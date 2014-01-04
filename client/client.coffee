@@ -1,5 +1,6 @@
 require 'Canvas', (canvasLib) ->
-	points = new Meteor.Collection('pointsCollection')
+	Points = new Meteor.Collection('pointsCollection')
+	pointId = Session.get 'pointId'
 	canvas = null
 
 	Deps.autorun ->
@@ -9,27 +10,21 @@ require 'Canvas', (canvasLib) ->
 		canvas = canvasLib.Canvas()
 
 		Deps.autorun ->
-			data = points.find({}).fetch()
+			data = Points.find({}).fetch()
 			$('h2').hide()
 			canvas.draw(data) if canvas
 
-	Template.drawingSurface.title = ->
-		return 'Draw with Me! (A Collaborative, Real-Time Drawing Environment) Works best in Chrome.'
-
-	Template.drawingSurface.events
-		'click input': (event) ->
-			Meteor.call 'clear', -> canvas.clear()
-
-	markPoint = (event) ->
+	updatePoint = (event) ->
 		offset = $('#canvas').offset()
-		points.insert
+		data = 
 			x: event.pageX - offset.left
 			y: event.pageY - offset.top
+			updated: new Date().getTime()
+		if not pointId
+			pointId = Points.insert data
+			Session.set 'pointId', pointId
+		else
+			Points.update( pointId, data )
 
 	Template.canvas.events
-		'click': (event) -> markPoint(event)
-		'mousedown': (event) -> Session.set('draw', true)
-		'mouseup': (event) -> Session.set('draw', false)
-		'mousemove': (event) ->
-			if Session.get('draw')
-				markPoint(event)
+		'mousemove': (event) -> updatePoint(event)

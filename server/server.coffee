@@ -1,7 +1,7 @@
-points = new Meteor.Collection('pointsCollection')
+Points = new Meteor.Collection('pointsCollection')
 
 Meteor.publish 'pointsSubscription', ->
-  return points.find()
+  return Points.find()
 
 Meteor.methods
-  clear: -> points.remove({});
+  clear: -> Points.remove({});

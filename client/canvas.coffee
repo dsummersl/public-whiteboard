@@ -17,12 +17,25 @@ class Canvas
 			@clear()
 			return
 		if @svg
-			@svg.selectAll('circle').data(data, (d)-> d._id )
-			.enter().append('circle')
+			selection = @svg.selectAll('circle').data(data, (d)-> d._id )
+
+			selection.enter().append('circle')
 			.attr('r', 10)
 			.attr('cx', (d)-> d.x)
 			.attr('cy', (d)-> d.y)
+			.style('fill', (d)-> 
+				d.hue = _.random(0,360)
+				d3.hsl(d.hue,0.5,0.5)
+			)
 
-define('Canvas', [], ->
+			selection.exit().remove()
+
+			selection
+				.attr('cx', (d)-> d.x)
+				.attr('cy', (d)-> d.y)
+			selection.transition()
+			  .duration(30000)
+			  .style('fill', (d)-> d3.hsl(d.hue,1,1))
+
+define 'Canvas', [], ->
 	Canvas: -> new Canvas()
-)
