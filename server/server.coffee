@@ -1,7 +1,8 @@
-Points = new Meteor.Collection('pointsCollection')
+Mice = new Meteor.Collection('mice')
+Paths = new Meteor.Collection('paths')
 
-Meteor.publish 'pointsSubscription', ->
-  return Points.find()
+Meteor.publish 'miceSubscription', ->
+  return Mice.find()
 
 Meteor.methods
-  clear: -> Points.remove({});
+  clear: -> Mice.remove({});

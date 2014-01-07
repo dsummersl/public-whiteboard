@@ -1,2 +1,2 @@
 Template.welcome.rendered = ->
-	$('#welcomeDialog').modal 'show'
+	#$('#welcomeDialog').modal 'show'
