@@ -1,17 +1,19 @@
-require ['Mice','Drawings'], (miceLib,drawLib)->
+require ['Mice','Drawing'], (miceLib,drawLib)->
 	Mice = new Meteor.Collection('mice')
 	Paths = new Meteor.Collection('paths')
 	mouseId = Session.get 'mouseId'
 	hue = null
 	canvas = null
 	mice = null
-	drawings = null
+	currentDrawing = null
 	path = null
 
-	drawMiceFn = ->
+	updateCanvasFn = ->
 		$('h2').hide()
-		data = Mice.find({}).fetch()
-		mice.draw(data) if canvas
+		allMice = Mice.find({}).fetch()
+		allDrawings = Paths.find({}).fetch()
+		if canvas
+			mice.draw(allMice)
 
 	updateMouseFn = (event) ->
 		offset = $('#canvas').offset()
@@ -28,7 +30,7 @@ require ['Mice','Drawings'], (miceLib,drawLib)->
 				'$set': data
 			)
 
-	updatePathsFn = (event)->
+	updateCurrentPathFn = (event)->
 		offset = $('#canvas').offset()
 		path.push({
 			time: new Date().getTime()
@@ -36,11 +38,11 @@ require ['Mice','Drawings'], (miceLib,drawLib)->
 			x: event.pageX - offset.left
 			y: event.pageY - offset.top
 		})
-		drawings.draw(path)
+		currentDrawing.draw(path)
 
 	Deps.autorun ->
 		Meteor.subscribe('miceSubscription')
-
+		Meteor.subscribe('pathsSubscription') 
 	Meteor.startup ->
 		# TODO scale the canvas so that regardless of points, they all fit on the
 		# screen.
@@ -48,9 +50,9 @@ require ['Mice','Drawings'], (miceLib,drawLib)->
 			.attr('width', '100%')
 			.attr('height', '100%')
 		mice = miceLib.Mice(canvas)
-		drawings = drawLib.Drawings(canvas)
-		Deps.autorun -> drawMiceFn()
-		Meteor.setInterval(drawMiceFn, 5000)
+		currentDrawing = drawLib.Drawing(canvas,mouseId)
+		Deps.autorun -> updateCanvasFn()
+		Meteor.setInterval(updateCanvasFn, 5000)
 
 	mmNumber = 0
 	Template.canvas.events
@@ -65,4 +67,4 @@ require ['Mice','Drawings'], (miceLib,drawLib)->
 			if mmNumber % 2 == 0
 				updateMouseFn(event)
 			if mmNumber % 5 == 0 and path?
-				updatePathsFn(event)
+				updateCurrentPathFn(event)

@@ -1,16 +1,15 @@
-class Drawings
+class Drawing
 
-	constructor: (@svg)->
-		@createSvg()
+	constructor: (@svg,@pathId)->
+		@clear()
 
 	createSvg: ->
-		# TODO each id should match...the mouseId?
 		@g = @svg.append('g')
-			.attr('id','path')
+			.attr('id',@pathId)
 		  .append('path')
 
 	clear: ->
-		d3.select('svg #path').remove()
+		d3.select("svg ##{@pathId}").remove()
 		@createSvg()
 
 	draw: (data) ->
@@ -18,6 +17,11 @@ class Drawings
 		if data.length < 1
 			@clear()
 			return
+
+		widthFn = d3.scale.sqrt()
+			.domain([1,20])
+			.range([15,1])
+			.clamp(true)
 
 		line = d3.svg.line()
 			.x((d)-> d.x)
@@ -27,10 +31,10 @@ class Drawings
 		selection = @g
 			.datum(data)
 		  .attr('d', line)
-			.attr('stroke', (d,i)-> d3.hsl(d[i].hue,0.5,0.5))
-			.attr('stroke-width', 3)
+			.attr('stroke', (d,i)-> d3.hsl(d[i].hue,0.4,0.6))
+			.attr('stroke-width', widthFn(data.length))
 			.attr('fill', 'none')
 			.style('stroke-linecap', 'round')
 
-define 'Drawings', [], ->
-	Drawings: (svg)-> new Drawings(svg)
+define 'Drawing', [], ->
+	Drawing: (svg)-> new Drawing(svg)
