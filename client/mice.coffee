@@ -1,6 +1,7 @@
 class Mice
 
-	constructor: (@svg)-> @createSvg()
+	constructor: (@svg)-> @clear()
+
 	createSvg: -> @g = @svg.append('g').attr('id','mice')
 
 	clear: ->
@@ -8,7 +9,6 @@ class Mice
 		@createSvg()
 
 	draw: (data) ->
-		return if not @g
 		if data.length < 1
 			@clear()
 			return
