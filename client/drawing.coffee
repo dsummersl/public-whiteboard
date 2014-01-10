@@ -7,7 +7,8 @@ class Drawings
 		@g = @svg.append('g').attr('id','drawings')
 
 	clear: ->
-		d3.select("svg ##{@pathId}").remove()
+		console.log("clear!");
+		d3.select("svg #drawings").remove()
 		@createSvg()
 
 	draw: (data) ->
@@ -15,26 +16,39 @@ class Drawings
 			@clear()
 			return
 
+		timeout = 10000
+		time = new Date().getTime()
+		fadeFn = d3.scale.linear()
+			.domain([time,time-timeout])
+			.range([timeout,0])
+			.clamp(true)
+
 		line = d3.svg.line()
 			.x((d)-> d.x)
 			.y((d)-> d.y)
 			.interpolate('basis')
 
-		stdAttribs = (s) ->
-			# to get the at the path's hue attribute I must use it before doing the
-			# datum() binding (otherwise, it appears that d.hue is always the...first
-			# path's hue attribute?).
+		stdAttribs = (s)->
 			s.attr('stroke', (d)-> d3.hsl(d.hue,0.6,0.6))
-			s.datum((d)-> d.path)
-				.attr('d', line)
+				.attr('d', (d)-> line(d.path))
 				.attr('stroke-width', 3)
 				.attr('fill', 'none')
 				.style('stroke-linecap', 'round')
+				.transition()
+				.duration((d,i)-> fadeFn(d.path[d.path.length-1].time))
+				.style('stroke-opacity', 0.1)
+				.attr('data-updated', (d)-> d.path[d.path.length-1].time)
 
 		selection = @g.selectAll('path').data(data, (d)-> d._id )
 
 		selection.enter().append('path').call(stdAttribs)
 		selection.exit().remove()
+
+		# optimization: use the last point of the path to determine whether or not
+		# this path is already updated or not. If updated, ignore.
+		selection
+			.filter( (d)-> d.path[d.path.length-1].time != parseInt(d3.select(@).attr('data-updated')))
+			.call(stdAttribs)
 
 define 'Drawings', [], ->
 	Drawings: (svg)-> new Drawings(svg)

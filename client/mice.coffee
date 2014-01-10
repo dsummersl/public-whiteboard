@@ -25,11 +25,11 @@ class Mice
 			.clamp(true)
 		opacityFn = d3.scale.linear()
 			.domain([time,time-timeout])
-			.range([1,0.2])
+			.range([1,0.1])
 			.clamp(true)
 		radiusFn = d3.scale.linear()
 			.domain([time,time-timeout])
-			.range([2,20])
+			.range([2,10])
 			.clamp(true)
 		satFn = d3.scale.linear()
 			.domain([time,time-timeout])
@@ -42,10 +42,8 @@ class Mice
 				.attr('cy', (d)-> d.y)
 				.attr('data-updated', (d)-> d.updated)
 				.attr('r', (d)-> radiusFn(d.updated))
-				.style('stroke-opacity', (d)-> opacityFn(d.updated))
-				.style('fill-opacity', 0)
-				.style('stroke', (d)-> d3.hsl(d.hue,satFn(d.updated),0.5))
-				.style('stroke-width', 2)
+				.style('fill-opacity', (d)-> opacityFn(d.updated))
+				.style('fill', (d)-> d3.hsl(d.hue,satFn(d.updated),0.5))
 
 		# When I create a new picture, I bind a random color to the element for
 		# future use (since the original data set doesn't actually contain a color
@@ -55,7 +53,7 @@ class Mice
 		# not really expecting things to leave, but if they do, go away:
 		selection.exit().remove()
 
-		# Minor optimization: don't update unchanged values.
+		# optimization: don't update unchanged values.
 		selection = selection
 			.filter( (d)-> d.updated != parseInt(d3.select(@).attr('data-updated')))
 
@@ -70,7 +68,7 @@ class Mice
 			.each('end', ->
 				selection.transition()
 					.duration((d)-> fadeFn(d.updated))
-					.style('stroke-opacity', (d)-> opacityFn(d.updated - fadeFn(d.updated)))
+					.style('fill-opacity', (d)-> opacityFn(d.updated - fadeFn(d.updated)))
 					.attr('r', (d)-> radiusFn(d.updated - fadeFn(d.updated)))
 			)
 
