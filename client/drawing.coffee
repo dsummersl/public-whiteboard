@@ -1,13 +1,11 @@
 class Drawings
 
-	constructor: (@svg)->
-		@clear()
+	constructor: (@canvas)-> @clear()
 
 	createSvg: ->
-		@g = @svg.append('g').attr('id','drawings')
+		@g = @canvas.svg.append('g').attr('id','drawings')
 
 	clear: ->
-		console.log("clear!");
 		d3.select("svg #drawings").remove()
 		@createSvg()
 
@@ -16,16 +14,21 @@ class Drawings
 			@clear()
 			return
 
-		timeout = 10000
+		timeout = 1000 * 60 * 60
 		time = new Date().getTime()
 		fadeFn = d3.scale.linear()
 			.domain([time,time-timeout])
 			.range([timeout,0])
 			.clamp(true)
+		opacityFn = d3.scale.linear()
+			.domain([time,time-timeout])
+			.range([1,0.1])
+			.clamp(true)
 
+		canvas = @canvas
 		line = d3.svg.line()
-			.x((d)-> d.x)
-			.y((d)-> d.y)
+			.x((d)=> canvas.x(d.x))
+			.y((d)=> canvas.y(d.y))
 			.interpolate('basis')
 
 		stdAttribs = (s)->
@@ -33,11 +36,12 @@ class Drawings
 				.attr('d', (d)-> line(d.path))
 				.attr('stroke-width', 3)
 				.attr('fill', 'none')
+				.attr('data-updated', (d)-> d.path[d.path.length-1].time)
 				.style('stroke-linecap', 'round')
+				.style('stroke-opacity', (d)-> opacityFn(d.path[d.path.length-1].time))
 				.transition()
 				.duration((d,i)-> fadeFn(d.path[d.path.length-1].time))
 				.style('stroke-opacity', 0.1)
-				.attr('data-updated', (d)-> d.path[d.path.length-1].time)
 
 		selection = @g.selectAll('path').data(data, (d)-> d._id )
 
@@ -51,4 +55,4 @@ class Drawings
 			.call(stdAttribs)
 
 define 'Drawings', [], ->
-	Drawings: (svg)-> new Drawings(svg)
+	Drawings: (canvas)-> new Drawings(canvas)

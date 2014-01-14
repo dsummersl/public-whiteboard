@@ -1,8 +1,8 @@
 class Mice
 
-	constructor: (@svg)-> @clear()
+	constructor: (@canvas)-> @clear()
 
-	createSvg: -> @g = @svg.append('g').attr('id','mice')
+	createSvg: -> @g = @canvas.svg.append('g').attr('id','mice')
 
 	clear: ->
 		d3.select('svg #mice').remove()
@@ -37,20 +37,16 @@ class Mice
 			.clamp(true)
 
 		# Standard attributes used by both insert and update activities:
-		stdAttribs = (s) ->
-			s.attr('cx', (d)-> d.x)
-				.attr('cy', (d)-> d.y)
+		canvas = @canvas
+		stdAttribs = (s) =>
+			s.attr('cx', (d)=> canvas.x(d.x))
+				.attr('cy', (d)=> canvas.y(d.y))
 				.attr('data-updated', (d)-> d.updated)
 				.attr('r', (d)-> radiusFn(d.updated))
 				.style('fill-opacity', (d)-> opacityFn(d.updated))
 				.style('fill', (d)-> d3.hsl(d.hue,satFn(d.updated),0.5))
 
-		# When I create a new picture, I bind a random color to the element for
-		# future use (since the original data set doesn't actually contain a color
-		# attribute and it won't be around later on).
 		selection.enter().append('circle').call(stdAttribs)
-
-		# not really expecting things to leave, but if they do, go away:
 		selection.exit().remove()
 
 		# optimization: don't update unchanged values.
@@ -59,18 +55,23 @@ class Mice
 
 		selection
 			.attr('data-updated', (d)-> d.updated)
-			.attr('cx', (d)-> d.x)
-			.attr('cy', (d)-> d.y)
+			.attr('cx', (d)=> canvas.x(d.x))
+			.attr('cy', (d)=> canvas.y(d.y))
 
 		selection.transition()
 			.duration(100)
 			.call(stdAttribs)
 			.each('end', ->
 				selection.transition()
+					# the fadeFn ensures that if we are putting an old mouse on the screen
+					# it 'starts' this transition at the proper point (if its really old
+					# the transition is 0, and if its really new, then it needs the full
+					# time)
 					.duration((d)-> fadeFn(d.updated))
-					.style('fill-opacity', (d)-> opacityFn(d.updated - fadeFn(d.updated)))
-					.attr('r', (d)-> radiusFn(d.updated - fadeFn(d.updated)))
+					# transition the opacity based on its *future* time
+					.style('fill-opacity', (d)-> opacityFn(time-timeout))
+					.attr('r', (d)-> radiusFn(time-timeout))
 			)
 
 define 'Mice', [], ->
-	Mice: (svg)-> new Mice(svg)
+	Mice: (canvas)-> new Mice(canvas)

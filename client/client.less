@@ -1,0 +1,26 @@
+@import "/packages/bootstrap3-less/bootstrap.lessimport";
+
+#canvas {
+	cursor: none;
+	border: 1px solid #eeeeee;
+	border-radius: 5px;
+	margin: 2%;
+}
+
+/* http://stackoverflow.com/questions/12121090/responsively-change-div-size-keeping-aspect-ratio */
+.aspectRatio-16-9 {
+	width: 90%;
+	display: inline-block;
+	position: relative;
+}
+
+.aspectRatio-16-9:after {
+	padding-top: 56.25%;
+	display: block;
+	content: '';
+}
+
+.aspectRatio-16-9 > div {
+	position: absolute;
+	top: 0; bottom: 0; right: 0; left: 0; /*fill parent*/
+}

@@ -1,4 +1,4 @@
-require ['Mice','Drawings'], (miceLib,drawLib)->
+require ['Canvas','Mice','Drawings'], (canvasLib,miceLib,drawLib)->
 	Mice = new Meteor.Collection('mice')
 	Paths = new Meteor.Collection('paths')
 	mouseId = Session.get 'mouseId'
@@ -19,8 +19,8 @@ require ['Mice','Drawings'], (miceLib,drawLib)->
 		offset = $('#canvas').offset()
 		data = 
 			updated: new Date().getTime()
-			x: event.pageX - offset.left
-			y: event.pageY - offset.top
+			x: canvas.xToPercent(event.pageX - offset.left)
+			y: canvas.yToPercent(event.pageY - offset.top)
 		if not mouseId?
 			data.hue = _.random(0,360)
 			mouseId = Mice.insert data
@@ -39,8 +39,8 @@ require ['Mice','Drawings'], (miceLib,drawLib)->
 		data.path = Paths.findOne(pathId).path if pathId?
 		data.path.push({
 			time: new Date().getTime()
-			x: event.pageX - offset.left
-			y: event.pageY - offset.top
+			x: canvas.xToPercent(event.pageX - offset.left)
+			y: canvas.yToPercent(event.pageY - offset.top)
 		})
 		if not pathId?
 			pathId = Paths.insert data
@@ -49,20 +49,19 @@ require ['Mice','Drawings'], (miceLib,drawLib)->
 				'$set': data
 			)
 
+	# when the screen size changes, update the canvases since the mice/drawing
+	# locations are no longer correct.
+	$(window).resize(-> updateCanvasFn())
+
 	Deps.autorun ->
 		Meteor.subscribe('miceSubscription')
 		Meteor.subscribe('pathsSubscription') 
 
 	Meteor.startup ->
-		# TODO scale the canvas so that regardless of points, they all fit on the
-		# screen.
-		canvas = d3.select('#canvas').append('svg')
-			.attr('width', '100%')
-			.attr('height', '100%')
+		canvas = canvasLib.Canvas()
 		mice = miceLib.Mice(canvas)
 		drawings = drawLib.Drawings(canvas)
 		Deps.autorun -> updateCanvasFn()
-		Meteor.setInterval(updateCanvasFn, 5000)
 
 	mmNumber = 0
 	Template.canvas.events
