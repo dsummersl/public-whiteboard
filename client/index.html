@@ -3,12 +3,23 @@
 </head>
 
 <body>
-  {{> welcome}}
   {{> drawingSurface}}
+  {{> title}}
+</body>
+
+<template name="title">
   <div class="titleAndCopyright">
     <span class="title">the Public Whiteboard</span>
+    <span id="helpIcon"
+      data-trigger="hover"
+      data-placement="top"
+      data-container="body"
+      data-title="Summary"
+      data-content="Click and drag to draw lines on the board above. You can see other viewers move around the board (and their drawings!). Over time drawings fade from the board to make room for new drawings."
+      class="glyphicon glyphicon-question-sign"
+    ></span>
     <span class="copyright">
       Copyright 2014 <a href="mailto:dsummersl@yahoo.com">Dane Summers</a>
     </span>
   </div>
-</body>
+</template>
