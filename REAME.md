@@ -5,7 +5,7 @@ A real time collaborative drawing surface: draw on the whiteboard, and see every
 other website viewer as they draw or move about the board. Over time old
 drawings fade from the board.
 
-Demo: [the Public Whiteboard](http://whiteboard.meteor.com)
+Demo: [the Public Whiteboard](http://publicboard.meteor.com)
 
 Inspired by
 [meteor-multidraw-demo](https://github.com/nwmartin/meteor-multidraw-demo).
