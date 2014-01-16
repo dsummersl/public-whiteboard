@@ -8,7 +8,6 @@ class Canvas
 		$(window).resize(=> @setupMappings())
 
 	setupMappings: ->
-		console.log("setupMappings");
 		svg = $('#canvas svg')
 		@x = d3.scale.linear()
 			.domain([0,100])

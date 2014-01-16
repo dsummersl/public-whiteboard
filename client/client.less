@@ -1,16 +1,45 @@
 @import "/packages/bootstrap3-less/bootstrap.lessimport";
 
+@margins: 5%;
+
+body {
+	margin: 2%;
+}
+
+.titleAndCopyright {
+	width: 90%;
+	margin: 0 @margins;
+	height: 50px;
+	line-height: 50px;
+	vertical-align: baseline;
+}
+
+.title {
+	.h1;
+}
+
+.copyright {
+	float: right;
+}
+
 #canvas {
 	cursor: none;
 	border: 1px solid #eeeeee;
 	border-radius: 5px;
-	margin: 2%;
 }
 
-/* http://stackoverflow.com/questions/12121090/responsively-change-div-size-keeping-aspect-ratio */
+/* 
+
+Lock a div to a specific aspect ratio. I had a bit of trouble doing this and
+centering the div. It turned out to be a combination of things:
+
+ - Use the fact that 'padding-top' %s are relative to the width: http://stackoverflow.com/questions/12121090/responsively-change-div-size-keeping-aspect-ratio
+ - Use the fact that you can specify margins as %s: http://stackoverflow.com/questions/2624159/centering-a-percent-based-div 
+
+*/
 .aspectRatio-16-9 {
 	width: 90%;
-	display: inline-block;
+	margin: 0 @margins;
 	position: relative;
 }
 
